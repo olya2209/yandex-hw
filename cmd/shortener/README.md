@@ -11,3 +11,13 @@
 - инициализацию зависимостей (можно вынести в отдельный пакет `internal/app`)
 - настройку и запуск HTTP-сервера (можно вынести в отдельный пакет `internal/router`)
 - обработку сигналов завершения работы приложения
+
+
+curl -X POST \                  
+-H "Content-Type: text/plain" \
+-d "https://practicum.yandex.ru/" \
+http://localhost:8080
+
+curl -X GET \                   
+-H "Content-Type: text/plain" \
+http://localhost:8080/xxxx
