@@ -139,6 +139,7 @@ func TestHandleCreateShortURL_Fail(t *testing.T) {
 }
 
 func TestRegistrationRoutes_BadRoute(t *testing.T) {
+	registrationRoutes()
 	tests := []testCase{
 		{
 			name:    "incorrect route for post request",
@@ -220,6 +221,7 @@ func TestRegistrationRoutes_BadRoute(t *testing.T) {
 				statusCode: http.StatusBadRequest,
 			},
 		},
+
 		{
 			name:    "incorrect route method - delete",
 			request: "/",
@@ -285,7 +287,6 @@ func TestRegistrationRoutes_BadRoute(t *testing.T) {
 			request := httptest.NewRequest(tt.metod, tt.request, bytes.NewBuffer(body))
 			request.Host = localHost
 
-			registrationRoutes()
 			http.DefaultServeMux.ServeHTTP(recorder, request)
 
 			resBody, _ := ioutil.ReadAll(recorder.Body)
