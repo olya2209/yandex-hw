@@ -24,6 +24,7 @@ func main() {
 		panic(err)
 	}
 	long = strings.TrimSuffix(long, "\n")
+	fmt.Println("long:", long)
 	// заполняем контейнер данными
 	data.Set("url", long)
 	// добавляем HTTP-клиент
@@ -37,7 +38,7 @@ func main() {
 	}
 	// в заголовках запроса указываем кодировку
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	// отправляем запрос и получаем ответ
+	// отправляем запрос и получаем ответ2
 	response, err := client.Do(request)
 	if err != nil {
 		panic(err)
