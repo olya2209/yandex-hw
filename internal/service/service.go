@@ -8,6 +8,8 @@ import (
 	repo "github.com/olya2209/yandex-hw/internal/repository"
 )
 
+const sizeHash = 16
+
 type CaseURL interface {
 	SetURL(url string) (string, error)
 	GetURL(hash string) (string, error)
@@ -30,7 +32,7 @@ func (s *Service) SetURL(originalURL string) (string, error) {
 	}
 
 	hash := sha256.Sum256([]byte(originalURL))
-	shortHash := fmt.Sprintf("%x", hash[:8])
+	shortHash := fmt.Sprintf("%x", hash[:sizeHash])
 	err := s.repo.Set(originalURL, shortHash)
 
 	return shortHash, err

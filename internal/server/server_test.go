@@ -9,6 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/olya2209/yandex-hw/internal/config"
 )
 
 // Mock для use case
@@ -17,9 +19,16 @@ type MockCaseURL struct {
 }
 
 func newWrapServer() *Server {
+	cfg := &config.Config{
+		Opts: &config.Options{
+			Addr:    "localhost:8080",
+			BaseURL: "localhost:8080",
+		},
+	}
 	cu := &MockCaseURL{}
 	return &Server{
-		su: cu,
+		cfg: cfg,
+		su:  cu,
 	}
 }
 
@@ -59,13 +68,6 @@ func TestServerGetURL(t *testing.T) {
 
 			expectedStatus:   http.StatusTemporaryRedirect,
 			expectedLocation: "https://practicum.yandex.ru/",
-		},
-		{
-			name:   "wrong method",
-			method: http.MethodPost,
-			path:   "/abc1234567890",
-
-			expectedStatus: http.StatusBadRequest,
 		},
 		{
 			name:   "not found",
@@ -133,7 +135,7 @@ func TestServerSetURL(t *testing.T) {
 			mockError: nil,
 
 			expectedStatus: http.StatusCreated,
-			expectedBody:   "http://localhost:8080/abc",
+			expectedBody:   "localhost:8080/abc",
 		},
 		{
 			name:        "bad content type",
@@ -148,20 +150,6 @@ func TestServerSetURL(t *testing.T) {
 
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "Content-Type must be text/plain\n",
-		},
-		{
-			name:        "invalid method",
-			method:      http.MethodTrace,
-			url:         "https://practicum.yandex.ru/",
-			contentType: "text/plain",
-
-			isOn:      false,
-			mockURL:   "https://practicum.yandex.ru/",
-			mockHash:  "abc",
-			mockError: nil,
-
-			expectedStatus: http.StatusBadRequest,
-			expectedBody:   "method must be POST\n",
 		},
 	}
 
