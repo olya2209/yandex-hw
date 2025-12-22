@@ -1,3 +1,3 @@
-module yandex-hw
+module github.com/olya2209/yandex-hw
 
-go 1.25.3
+go 1.24.11
