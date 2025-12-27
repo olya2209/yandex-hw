@@ -69,12 +69,12 @@ func TestHandleCreateShortURLRedirect_Success(t *testing.T) {
 			assert.Equal(t, tt.want.statusCode, resultPost.StatusCode)
 			assert.Equal(t, tt.want.contentType, resultPost.Header.Get("Content-Type"))
 
-			shortUrl, err := ioutil.ReadAll(resultPost.Body)
+			shortURL, err := ioutil.ReadAll(resultPost.Body)
 			require.NoError(t, err)
 			err = resultPost.Body.Close()
 			require.NoError(t, err)
 
-			key := shortUrl[len(shortUrl)-tt.want.lenShortUrl:]
+			key := shortURL[len(shortURL)-tt.want.lenShortUrl:]
 			value, ok := GetValue(string(key))
 			if !ok {
 				t.Errorf("Не найдено значение короткого url в мапе по ключу %d", key)
