@@ -27,7 +27,7 @@ const (
 type want struct {
 	contentType string
 	statusCode  int
-	lenShortUrl int
+	lenShortURL int
 	bodyText    string
 }
 
@@ -48,7 +48,7 @@ func TestHandleCreateShortURLRedirect_Success(t *testing.T) {
 			want: want{
 				contentType: "text/plain",
 				statusCode:  http.StatusCreated,
-				lenShortUrl: 8,
+				lenShortURL: 8,
 			},
 		},
 	}
@@ -74,14 +74,14 @@ func TestHandleCreateShortURLRedirect_Success(t *testing.T) {
 			err = resultPost.Body.Close()
 			require.NoError(t, err)
 
-			key := shortURL[len(shortURL)-tt.want.lenShortUrl:]
+			key := shortURL[len(shortURL)-tt.want.lenShortURL:]
 			value, ok := GetValue(string(key))
 			if !ok {
 				t.Errorf("Не найдено значение короткого url в мапе по ключу %d", key)
 			}
 
 			assert.Equal(t, tt.url, value)
-			assert.Equal(t, tt.want.lenShortUrl, len(key))
+			assert.Equal(t, tt.want.lenShortURL, len(key))
 
 			//Проверяем get
 			recorderGet := httptest.NewRecorder()
