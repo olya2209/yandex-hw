@@ -3,41 +3,55 @@ package server
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-
 	"github.com/olya2209/yandex-hw/internal/config"
+	"github.com/olya2209/yandex-hw/internal/logger"
 	srv "github.com/olya2209/yandex-hw/internal/service"
+	"go.uber.org/zap"
 )
 
 type Server struct {
 	cfg   *config.Config
 	route *chi.Mux
 	su    srv.CaseURL
+	log   zap.SugaredLogger
 }
 
-func NewServer(cfg *config.Config) *Server {
+func NewServer(cfg *config.Config, sugar zap.SugaredLogger) *Server {
 	server := &Server{
 		cfg:   cfg,
 		route: chi.NewRouter(),
 		su:    srv.NewService(),
+		log:   sugar,
 	}
 	server.router()
 	return server
 }
 
+// хендлер для /ping
+func (s *Server) SetURLHandler() http.Handler {
+	return http.HandlerFunc(s.SetURL)
+}
+
+func (s *Server) GetURLHandler() http.Handler {
+	return http.HandlerFunc(s.GetURL)
+}
+
 func (s *Server) router() {
-	s.route.Post("/", s.SetURL)
-	s.route.Get("/{id}", s.GetURL)
+	s.route.Post("/", logger.WithLogging(s.SetURLHandler(), s.log))
+	//Сведения об ответах должны содержать код статуса и размер содержимого ответа
+	s.route.Get("/{id}", logger.WithLogging(s.GetURLHandler(), s.log))
 }
 
 func (s *Server) Run() {
 	fmt.Println("server started ...")
+	//Все сообщения логгера должны быть на уровне Info
+	//Сведения о запросах должны содержать URI, метод запроса и время, затраченное на его выполнение.
 	if err := http.ListenAndServe(s.cfg.Opts.Addr, s.route); err != nil {
-		log.Fatalln(err)
+		s.log.Fatalw(err.Error(), "event", "start server")
 	}
 }
 
