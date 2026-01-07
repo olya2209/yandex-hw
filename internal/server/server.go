@@ -64,15 +64,17 @@ func (s *Server) Run() {
 func (s *Server) SetURL(res http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get("Content-Type")
 	if contentType != "text/plain" {
-		s.log.Errorln("Content-Type must be text/plain")
-		res.WriteHeader(http.StatusBadRequest)
+		errM := "Content-Type must be text/plain"
+		s.log.Errorln(errM)
+		http.Error(res, errM, http.StatusBadRequest)
 		return
 	}
 
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		s.log.Errorln("cannot read body")
-		res.WriteHeader(http.StatusBadRequest)
+		errM := "cannot read body"
+		s.log.Errorln(errM)
+		http.Error(res, errM, http.StatusBadRequest)
 		return
 	}
 	defer req.Body.Close()
@@ -80,7 +82,7 @@ func (s *Server) SetURL(res http.ResponseWriter, req *http.Request) {
 	hash, err := s.su.SetURL(string(body))
 	if err != nil {
 		s.log.Errorln(err.Error())
-		res.WriteHeader(http.StatusBadRequest)
+		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -92,23 +94,25 @@ func (s *Server) SetURL(res http.ResponseWriter, req *http.Request) {
 func (s *Server) ShortURL(res http.ResponseWriter, req *http.Request) {
 	contentType := req.Header.Get("Content-Type")
 	if contentType != "application/json" {
-		s.log.Errorln("Content-Type must be application/json")
-		res.WriteHeader(http.StatusBadRequest)
+		errM := "Content-Type must be application/json"
+		s.log.Errorln()
+		http.Error(res, errM, http.StatusBadRequest)
 		return
 	}
 
 	var r models.Request
 	dec := json.NewDecoder(req.Body)
 	if err := dec.Decode(&r); err != nil {
-		s.log.Errorln("cannot decode request JSON body")
-		res.WriteHeader(http.StatusBadRequest)
+		errM := "cannot decode request JSON body"
+		s.log.Errorln(errM)
+		http.Error(res, errM, http.StatusBadRequest)
 		return
 	}
 
 	hash, err := s.su.SetURL(r.Url)
 	if err != nil {
 		s.log.Errorln(err.Error())
-		res.WriteHeader(http.StatusBadRequest)
+		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -120,16 +124,18 @@ func (s *Server) ShortURL(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
 	if res.Header().Get("Content-Type") != "application/json" {
-		s.log.Errorln("Content-Type must be application/json")
-		res.WriteHeader(http.StatusBadRequest)
+		errM := "Content-Type must be application/json"
+		s.log.Errorln(errM)
+		http.Error(res, errM, http.StatusBadRequest)
 		return
 	}
 
 	// сериализуем ответ сервера
 	enc := json.NewEncoder(res)
 	if err = enc.Encode(resp); err != nil {
-		s.log.Errorln("error encoding response")
-		res.WriteHeader(http.StatusBadRequest)
+		errM := "error encoding response"
+		s.log.Errorln(errM)
+		http.Error(res, errM, http.StatusBadRequest)
 		return
 	}
 	s.log.Infoln("sending HTTP 200 response")
@@ -143,8 +149,9 @@ func (s *Server) GetURL(res http.ResponseWriter, req *http.Request) {
 
 	url, err := s.su.GetURL(hash)
 	if err != nil {
-		s.log.Errorln(err.Error())
-		res.WriteHeader(http.StatusBadRequest)
+		errM := err.Error()
+		s.log.Errorln(errM)
+		http.Error(res, errM, http.StatusBadRequest)
 		return
 	}
 

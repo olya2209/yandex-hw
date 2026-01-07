@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/olya2209/yandex-hw/internal/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -25,10 +26,15 @@ func newWrapServer() *Server {
 			BaseURL: "localhost:8080",
 		},
 	}
+	sugar, err := logger.NewLogger(cfg.Opts.Addr)
+	if err != nil {
+		panic(err)
+	}
 	cu := &MockCaseURL{}
 	return &Server{
 		cfg: cfg,
 		su:  cu,
+		log: sugar,
 	}
 }
 
