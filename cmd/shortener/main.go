@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	//TODO добавить переменные окружения
 	cfg, err := config.NewConfig()
 
 	sugar, err := logger.NewLogger(cfg.Opts.Addr)

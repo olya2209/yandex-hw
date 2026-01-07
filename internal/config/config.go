@@ -33,9 +33,10 @@ func newOpts() (*Options, error) {
 
 	if opt.Addr == "" {
 		addr = flag.String("a", defaultURL, "server host")
+	} else {
+		addr = &opt.Addr
 	}
 
-	addr = &opt.Addr
 	if _, err = url.Parse("https://" + *addr); err != nil {
 		return nil, fmt.Errorf("incorrect parametr `-a` %s", *addr)
 	}
@@ -43,9 +44,10 @@ func newOpts() (*Options, error) {
 	if opt.BaseURL == "" {
 		baseURL = flag.String("b", defaultURL, "value before short URL")
 		flag.Parse()
+	} else {
+		baseURL = &opt.BaseURL
 	}
 
-	baseURL = &opt.BaseURL
 	if _, err = url.Parse("https://" + *baseURL); err != nil {
 		return nil, fmt.Errorf("incorrect parametr `-b` %s", *baseURL)
 	}
