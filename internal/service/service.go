@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/olya2209/yandex-hw/internal/config"
 	repo "github.com/olya2209/yandex-hw/internal/repository"
 )
 
@@ -19,10 +20,14 @@ type Service struct {
 	repo repo.Repository
 }
 
-func NewService() CaseURL {
-	return &Service{
-		repo: repo.NewStorage(),
+func NewService(cfg *config.Config) (CaseURL, error) {
+	repo, err := repo.NewStorage(cfg)
+	if err != nil {
+		return nil, err
 	}
+	return &Service{
+		repo: repo,
+	}, nil
 }
 
 func (s *Service) SetURL(originalURL string) (string, error) {
