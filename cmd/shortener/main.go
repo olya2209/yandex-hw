@@ -4,19 +4,25 @@ import (
 	"log"
 
 	"github.com/olya2209/yandex-hw/internal/config"
-	"github.com/olya2209/yandex-hw/internal/logger"
 	"github.com/olya2209/yandex-hw/internal/server"
+	"go.uber.org/zap"
 )
 
-func main() {
-	//TODO добавить переменные окружения
-	cfg, err := config.NewConfig()
+var sugar zap.SugaredLogger
 
-	sugar, err := logger.NewLogger(cfg.Opts.Addr)
+func main() {
+	cfg, err := config.NewConfig()
 	if err != nil {
 		log.Fatalln(err)
-		panic(err)
 	}
+	// logging.
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		// вызываем панику, если ошибка
+		log.Fatal(err)
+	}
+	defer logger.Sync()
+	sugar = *logger.Sugar()
 
 	s := server.NewServer(cfg, sugar)
 	s.Run()
