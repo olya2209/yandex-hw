@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 
+	"database/sql"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/olya2209/yandex-hw/internal/config"
 	"github.com/olya2209/yandex-hw/internal/server"
 	"go.uber.org/zap"
@@ -15,16 +18,23 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	// logging.
 	logger, err := zap.NewDevelopment()
 	if err != nil {
-		// вызываем панику, если ошибка
 		log.Fatal(err)
 	}
 	defer logger.Sync()
 	sugar = *logger.Sugar()
 
-	s, err := server.NewServer(cfg, sugar)
+	// dataBase
+	db, err := sql.Open("pgx", cfg.Opts.DbAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	s, err := server.NewServer(cfg, sugar, db)
 	if err != nil {
 		sugar.Fatalln(err)
 	}
