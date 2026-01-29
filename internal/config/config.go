@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -17,10 +19,21 @@ type Options struct {
 	BaseURL     string `env:"BASE_URL"`
 	StorageFile string `env:"FILE_STORAGE_PATH"`
 	DbAddr      string `env:"DATABASE_DSN"`
+	PgDB
 }
 
-func NewConfig() (*Config, error) {
-	opts, err := newOpts()
+type PgDB struct {
+	HostDB   string
+	PortDB   string
+	UserDB   string
+	NameDB   string
+	PaswDB   string
+	PathDB   string
+	ParamsDB map[string]string
+}
+
+func NewConfig(logger zap.SugaredLogger) (*Config, error) {
+	opts, err := newOpts(logger)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +42,7 @@ func NewConfig() (*Config, error) {
 	}, nil
 }
 
-func newOpts() (*Options, error) {
+func newOpts(logger zap.SugaredLogger) (*Options, error) {
 	envAddr := os.Getenv("SERVER_ADDRESS")
 	envBaseURL := os.Getenv("BASE_URL")
 	envStorageFile := os.Getenv("FILE_STORAGE_PATH")
@@ -95,6 +108,10 @@ func newOpts() (*Options, error) {
 		dbAddrValue = envDbAddr
 	}
 
+	logger.Infow(
+		"cfg",
+		"opts", true,
+	)
 	return &Options{
 		Addr:        addrValue,
 		BaseURL:     baseURLValue,

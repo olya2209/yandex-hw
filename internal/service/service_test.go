@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"testing"
@@ -13,6 +14,10 @@ const maskURL = "maskURL"
 
 type MockRepo struct {
 	mock.Mock
+}
+
+func (m *MockRepo) Ping(ctx context.Context) error {
+	return fmt.Errorf("")
 }
 
 func newWrapService() *Service {

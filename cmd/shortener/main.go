@@ -3,10 +3,9 @@ package main
 import (
 	"log"
 
-	"database/sql"
-
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/olya2209/yandex-hw/internal/config"
+	"github.com/olya2209/yandex-hw/internal/config/db"
 	"github.com/olya2209/yandex-hw/internal/server"
 	"go.uber.org/zap"
 )
@@ -14,12 +13,7 @@ import (
 var sugar zap.SugaredLogger
 
 func main() {
-	cfg, err := config.NewConfig()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// logging.
+	// logging
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatal(err)
@@ -27,14 +21,17 @@ func main() {
 	defer logger.Sync()
 	sugar = *logger.Sugar()
 
-	// dataBase
-	db, err := sql.Open("pgx", cfg.Opts.DbAddr)
+	// config: env and flags
+	cfg, err := config.NewConfig(sugar)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	defer db.Close()
 
-	s, err := server.NewServer(cfg, sugar, db)
+	// dataBase
+	pgdb, _ := db.InitPostgresDB(cfg, sugar)
+	defer pgdb.Close()
+
+	s, err := server.NewServer(cfg, sugar, pgdb)
 	if err != nil {
 		sugar.Fatalln(err)
 	}

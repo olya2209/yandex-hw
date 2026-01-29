@@ -11,3 +11,9 @@
 - инициализацию зависимостей (можно вынести в отдельный пакет `internal/app`)
 - настройку и запуск HTTP-сервера (можно вынести в отдельный пакет `internal/router`)
 - обработку сигналов завершения работы приложения
+
+Переменные окружения
+DATABASE_DSN=postgres://olga:password@localhost:5432/dbname?sslmode=disable
+
+Для запуска с флагом
+go run main.go -d='postgres://olga:password@localhost:5432/dbname?sslmode=disable'

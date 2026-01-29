@@ -19,10 +19,6 @@ import (
 	srv "github.com/olya2209/yandex-hw/internal/service"
 )
 
-// const (
-// 	addr = "localhost:8080"
-// )
-
 type ResultURL struct {
 	Result string `json:"result" doc:"result"`
 }
@@ -36,11 +32,10 @@ type Server struct {
 	route *chi.Mux
 	su    srv.CaseURL
 	sugar zap.SugaredLogger
-	db    *sql.DB
 }
 
 func NewServer(cfg *config.Config, sugar zap.SugaredLogger, db *sql.DB) (*Server, error) {
-	su, err := srv.NewService(cfg)
+	su, err := srv.NewService(cfg, db)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +44,6 @@ func NewServer(cfg *config.Config, sugar zap.SugaredLogger, db *sql.DB) (*Server
 		route: chi.NewRouter(),
 		su:    su,
 		sugar: sugar,
-		db:    db,
 	}
 	server.router()
 	return server, nil
@@ -79,8 +73,6 @@ func (s *Server) JSONHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Content-Type must be application/json", http.StatusBadRequest)
 		return
 	}
-
-	// id := req.URL.Query().Get("url")
 
 	var addr URL
 	var buf bytes.Buffer
@@ -154,9 +146,14 @@ func (s *Server) GetURL(res http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) Ping(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		http.Error(res, "method must be Get", http.StatusBadRequest)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	if err := s.db.PingContext(ctx); err != nil {
+	if err := s.su.Ping(ctx); err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}

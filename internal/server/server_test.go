@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -40,6 +41,10 @@ func (m *MockCaseURL) GetURL(hash string) (string, error) {
 func (m *MockCaseURL) SetURL(url string) (string, error) {
 	args := m.Called(url)
 	return args.String(0), args.Error(1)
+}
+
+func (m *MockCaseURL) Ping(ctx context.Context) error {
+	return fmt.Errorf("")
 }
 
 func TestServerGetURL(t *testing.T) {
