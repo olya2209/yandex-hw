@@ -7,6 +7,7 @@ import (
 	"github.com/olya2209/yandex-hw/internal/config"
 	"github.com/olya2209/yandex-hw/internal/config/db"
 	"github.com/olya2209/yandex-hw/internal/server"
+	"github.com/olya2209/yandex-hw/migrations"
 	"go.uber.org/zap"
 )
 
@@ -30,6 +31,17 @@ func main() {
 	// dataBase
 	pgdb, _ := db.InitPostgresDB(cfg, sugar)
 	defer pgdb.Close()
+
+	sugar.Info("Running migrations...")
+	err = migrations.Up(pgdb)
+	if err != nil {
+		sugar.Warn(err)
+	}
+	defer func() {
+		migrations.Down(pgdb)
+		sugar.Info("Migrations down")
+	}()
+	sugar.Info("Migrations applied successfully")
 
 	s, err := server.NewServer(cfg, sugar, pgdb)
 	if err != nil {

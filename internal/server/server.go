@@ -35,7 +35,7 @@ type Server struct {
 }
 
 func NewServer(cfg *config.Config, sugar zap.SugaredLogger, db *sql.DB) (*Server, error) {
-	su, err := srv.NewService(cfg, db)
+	su, err := srv.NewService(cfg, db, sugar)
 	if err != nil {
 		return nil, err
 	}

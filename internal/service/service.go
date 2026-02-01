@@ -9,6 +9,7 @@ import (
 
 	"github.com/olya2209/yandex-hw/internal/config"
 	repo "github.com/olya2209/yandex-hw/internal/repository"
+	"go.uber.org/zap"
 )
 
 const sizeHash = 16
@@ -23,8 +24,8 @@ type Service struct {
 	repo repo.Repository
 }
 
-func NewService(cfg *config.Config, db *sql.DB) (CaseURL, error) {
-	repo, err := repo.NewStorage(cfg, db)
+func NewService(cfg *config.Config, db *sql.DB, logger zap.SugaredLogger) (CaseURL, error) {
+	repo, err := repo.NewStorage(cfg, db, logger)
 	if err != nil {
 		return nil, err
 	}
